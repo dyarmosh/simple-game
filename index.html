@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>GAME</title>
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+	<script>
+		$(document).ready(function(){
+			// $.post("/");
+		});
+
+		function login() {
+			var login = $("#login").val();
+			$.post("/login", { login: login })
+				.done(function(data) {
+					console.log(data);
+				})
+				.fail(function(err) {
+					alert(err);
+				});
+		}
+	</script>
+</head>
+
+
+<body>
+
+<input type="text" id="login_input" placeholder="login" />
+<input type="button" click="login()" />
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>GAME</title>
+	<style>
+		#main, html, body {
+			width: 100%;
+			height: 100%;
+			padding: 0px;
+			margin: 0px;
+		}
+
+		.player {
+			cursor: pointer;
+			position: absolute;
+			width: 50px;
+			height: 50px;
+			border-radius: 25px;
+			background-color: rgba(50, 200, 150, 0.5);
+			line-height: 50px;
+			text-align: center;
+		}
+	</style>
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+	<script>
+		var lastmousepos = [0,0];
+
+		var players = {};
+
+		function login() {
+			var login = $("#login_input").val();
+			$.post("/login", { login: login })
+				.done(function(data) {
+					console.log(data);
+					loggedIn();
+				})
+				.fail(function(err) {
+					alert(err);
+				});
+		}
+
+		function loggedIn() {
+			$('#main').html('');
+			start();
+		}
+
+		function start() {
+			$('#main').on('mousemove', function(e) {
+				lastmousepos[0] = e.pageX-25;
+				lastmousepos[1] = e.pageY-25;
+			})
+
+			$(document).on('keypress', function(e) {
+				debugger;
+			});
+
+			setInterval(function() {
+				$.post("/move", {x: lastmousepos[0], y:lastmousepos[1]});
+				$.get("/all")
+					.done(function(data) {
+						data.forEach(function(one) {
+							if (!players[one.login]) {
+								players[one.login] = {
+									x: one.position[0],
+									y: one.position[1],
+									div: $('<div class="player" id="player_' + one.login + '"></div>').appendTo("#main")
+								};
+							} else {
+								players[one.login].x = one.position[0];
+								players[one.login].y = one.position[1];
+							}
+						});
+
+						show();
+					});
+			}, 10);
+		}
+
+		function show() {
+			Object.keys(players).forEach(function(one) {
+				players[one].div.css({top:players[one].y+"px", left: players[one].x+"px"});
+				players[one].div.html(one);
+			});
+		}
+	</script>
+</head>
+
+<body>
+
+<div id="main">
+	<input type="text" id="login_input" placeholder="login" />
+	<input type="button" onclick="login()" value="login" />
+</div>
+
+</body>
+</html>
